@@ -10,6 +10,17 @@ find_package(Vulkan REQUIRED)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator/CMakeLists.txt)
     add_subdirectory(VulkanMemoryAllocator)
+    add_library(VulkanMemoryAllocator::VulkanMemoryAllocator ALIAS VulkanMemoryAllocator)
+    install(
+            TARGETS VulkanMemoryAllocator
+            EXPORT VulkanMemoryAllocator-Targets
+    )
+    install(
+            EXPORT VulkanMemoryAllocator-Targets
+            FILE VulkanMemoryAllocator-Targets.cmake
+            NAMESPACE VulkanMemoryAllocator::
+            DESTINATION lib/cmake/VulkanMemoryAllocator
+    )
 else()
     find_package(VulkanMemoryAllocator REQUIRED)
 endif()
