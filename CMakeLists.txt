@@ -24,10 +24,11 @@ target_include_directories(VulkanMemoryAllocator-Hpp
 
 target_link_libraries(VulkanMemoryAllocator-Hpp
     INTERFACE
-        Vulkan::Vulkan
-        VulkanMemoryAllocator::VulkanMemoryAllocator
+        #Vulkan::Vulkan
+        GPUOpen::VulkanMemoryAllocator
 )
 
+if (PROJECT_IS_TOP_LEVEL)
 install(
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/vk_mem_alloc_enums.hpp
@@ -57,3 +58,4 @@ install(
     NAMESPACE VulkanMemoryAllocator-Hpp::
     DESTINATION lib/cmake/VulkanMemoryAllocator-Hpp
 )
+endif(PROJECT_IS_TOP_LEVEL)
