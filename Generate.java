@@ -328,8 +328,10 @@ public class Generate {
      * @param constant whether it's constant
      * @param pointer whether it's a pointer
      * @param originalType original type
+     * @param underlyingType underlying type (`type` without const and pointers applied)
      */
-    record Var(String originalType, boolean constant, String type, boolean pointer, VarTag tag, String lenIfNotNull, boolean primitive, String name) {
+    record Var(String originalType, boolean constant, String type, boolean pointer, VarTag tag,
+               String lenIfNotNull, boolean primitive, String underlyingType, String name) {
 
         static final Pattern pattern = Pattern.compile(
                 "(const\\s+)?(\\w+)" +
@@ -350,6 +352,7 @@ public class Generate {
 
             if (type.startsWith("Vk")) type = "VULKAN_HPP_NAMESPACE::" + type.substring(2);
             else if (type.startsWith("Vma")) type = type.substring(3);
+            String underlyingType = type;
 
             boolean primitive = switch (type) {
                 case "void", "char", "uint32_t", "size_t" -> true;
@@ -384,7 +387,7 @@ public class Generate {
                 lenIfNotNull = matcher.group(8);
             }
 
-            return new Var(originalType, c, type, p1 || p2, tag, lenIfNotNull, primitive, matcher.group(9));
+            return new Var(originalType, c, type, p1 || p2, tag, lenIfNotNull, primitive, underlyingType, matcher.group(9));
         }
 
         public String capitalName() {
@@ -659,7 +662,7 @@ public class Generate {
             for (int i = 0; i < params.size(); i++) {
                 Var v = params.get(i);
                 if (v.lenIfNotNull == null) continue;
-                if (v.constant) { // Input array, respective size parameter can be deduced
+                if (v.constant && !v.underlyingType.equals("void")) { // Input array, respective size parameter can be deduced
                     Integer l = paramIndexByName.get(v.lenIfNotNull);
                     if (l != null && arrayByLengthIndex[l] == null) arrayByLengthIndex[l] = i;
                 }
@@ -669,7 +672,7 @@ public class Generate {
             List<Integer> outputs = new ArrayList<>(), defaultedOutputs = new ArrayList<>();
             for (int i = 0; i < params.size(); i++) {
                 Var v = params.get(i);
-                if (v.pointer && !v.constant) {
+                if (v.pointer && !v.constant && !v.originalType.equals("void*")) {
                     if (v.tag == VarTag.NOT_NULL) outputs.add(i);
                     else if (!v.primitive) {
                         defaultedOutputs.add(i);
@@ -725,7 +728,7 @@ public class Generate {
                         }
 
                         String t = p.type;
-                        if (enhanced && p.pointer) {
+                        if (enhanced && p.pointer && !p.underlyingType.equals("void")) {
                             if (p.lenIfNotNull != null) t = "VULKAN_HPP_NAMESPACE::" + (p.constant ? "ArrayProxy<" : "ArrayProxyNoTemporaries<") + p.stripPtr() + ">";
                             else if (p.tag == VarTag.NOT_NULL) t = p.stripPtr() + "&";
                             else if (!p.constant && !p.primitive) t = "VULKAN_HPP_NAMESPACE::Optional<" + p.stripPtr() + ">";
@@ -831,18 +834,18 @@ public class Generate {
                         if (uniqueHandle) {
                             if (params.get(outputs.get(0)).lenIfNotNull != null) {
                                 returnValue = "createUniqueHandleVector(" + returnValue +
-                                        (handle != namespaceHandle ? ", this" : "") +
+                                        (handle != namespaceHandle ? ", *this" : "") +
                                         (customVectorAllocator ? ", vectorAllocator)" : ", VectorAllocator())");
                             } else {
                                 returnValue = "createUniqueHandle(" + returnValue +
-                                        (handle != namespaceHandle ? ", this)" : ")");
+                                        (handle != namespaceHandle ? ", *this)" : ")");
                             }
                         }
                         if (ret.equals("void")) returnValue = "result";
                         else returnValue = "result, " + returnValue;
-                        s.append("\nresultCheck(result, VMA_HPP_NAMESPACE_STRING \"::");
+                        s.append("\nVULKAN_HPP_NAMESPACE::detail::resultCheck(result, VMA_HPP_NAMESPACE_STRING \"::");
                         if (handle != namespaceHandle) s.append(handle.name).append("::");
-                        s.append(methodName).append("\");\nreturn createResultValueType(").append(returnValue).append(");");
+                        s.append(methodName).append("\");\nreturn VULKAN_HPP_NAMESPACE::detail::createResultValueType(").append(returnValue).append(");");
                     } else if (!ret.equals("void")) s.append("\nreturn ").append(returnValue).append(";");
                     return processTemplate("""
                                 $0 {

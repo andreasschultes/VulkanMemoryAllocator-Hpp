@@ -14,6 +14,7 @@ namespace VMA_HPP_NAMESPACE {
   struct AllocationCreateInfo;
   struct PoolCreateInfo;
   struct AllocationInfo;
+  struct AllocationInfo2;
   struct DefragmentationInfo;
   struct DefragmentationMove;
   struct DefragmentationPassMoveInfo;
@@ -456,6 +457,12 @@ namespace VMA_HPP_NAMESPACE {
                            AllocationInfo* allocationInfo) const;
 
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    VULKAN_HPP_NODISCARD_WHEN_NO_EXCEPTIONS AllocationInfo2 getAllocationInfo2(Allocation allocation) const;
+#endif
+    void getAllocationInfo2(Allocation allocation,
+                            AllocationInfo2* allocationInfo) const;
+
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
     void setAllocationUserData(Allocation allocation,
                                void* userData) const;
 #else
@@ -528,6 +535,30 @@ namespace VMA_HPP_NAMESPACE {
                                                                             const Allocation* allocations,
                                                                             const VULKAN_HPP_NAMESPACE::DeviceSize* offsets,
                                                                             const VULKAN_HPP_NAMESPACE::DeviceSize* sizes) const;
+
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    typename VULKAN_HPP_NAMESPACE::ResultValueType<void>::type copyMemoryToAllocation(const void* srcHostPointer,
+                                                                                      Allocation dstAllocation,
+                                                                                      VULKAN_HPP_NAMESPACE::DeviceSize dstAllocationLocalOffset,
+                                                                                      VULKAN_HPP_NAMESPACE::DeviceSize size) const;
+#else
+    VULKAN_HPP_NODISCARD VULKAN_HPP_NAMESPACE::Result copyMemoryToAllocation(const void* srcHostPointer,
+                                                                             Allocation dstAllocation,
+                                                                             VULKAN_HPP_NAMESPACE::DeviceSize dstAllocationLocalOffset,
+                                                                             VULKAN_HPP_NAMESPACE::DeviceSize size) const;
+#endif
+
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    typename VULKAN_HPP_NAMESPACE::ResultValueType<void>::type copyAllocationToMemory(Allocation srcAllocation,
+                                                                                      VULKAN_HPP_NAMESPACE::DeviceSize srcAllocationLocalOffset,
+                                                                                      void* dstHostPointer,
+                                                                                      VULKAN_HPP_NAMESPACE::DeviceSize size) const;
+#else
+    VULKAN_HPP_NODISCARD VULKAN_HPP_NAMESPACE::Result copyAllocationToMemory(Allocation srcAllocation,
+                                                                             VULKAN_HPP_NAMESPACE::DeviceSize srcAllocationLocalOffset,
+                                                                             void* dstHostPointer,
+                                                                             VULKAN_HPP_NAMESPACE::DeviceSize size) const;
+#endif
 
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
     typename VULKAN_HPP_NAMESPACE::ResultValueType<void>::type checkCorruption(uint32_t memoryTypeBits) const;
