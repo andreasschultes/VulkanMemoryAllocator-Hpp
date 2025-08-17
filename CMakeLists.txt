@@ -7,6 +7,14 @@ project(
     DESCRIPTION "C++ bindings for the VulkanMemoryAllocator library."
     LANGUAGES C CXX)
 
+find_package(Vulkan REQUIRED)
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator/CMakeLists.txt)
+    add_subdirectory(VulkanMemoryAllocator)
+else()
+    find_package(VulkanMemoryAllocator REQUIRED)
+endif()
+
 add_library(VulkanMemoryAllocator-Hpp INTERFACE)
 add_library(VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp ALIAS VulkanMemoryAllocator-Hpp)
 

@@ -837,6 +837,7 @@ namespace VMA_HPP_NAMESPACE {
   }
 
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+
   VULKAN_HPP_INLINE typename VULKAN_HPP_NAMESPACE::ResultValueType<VULKAN_HPP_NAMESPACE::Buffer>::type Allocator::createAliasingBuffer2(Allocation allocation,
                                                                                                                                         VULKAN_HPP_NAMESPACE::DeviceSize allocationLocalOffset,
                                                                                                                                         const VULKAN_HPP_NAMESPACE::BufferCreateInfo& bufferCreateInfo) const {
@@ -916,6 +917,7 @@ namespace VMA_HPP_NAMESPACE {
   }
 
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+
   VULKAN_HPP_INLINE typename VULKAN_HPP_NAMESPACE::ResultValueType<VULKAN_HPP_NAMESPACE::Image>::type Allocator::createAliasingImage2(Allocation allocation,
                                                                                                                                       VULKAN_HPP_NAMESPACE::DeviceSize allocationLocalOffset,
                                                                                                                                       const VULKAN_HPP_NAMESPACE::ImageCreateInfo& imageCreateInfo) const {
